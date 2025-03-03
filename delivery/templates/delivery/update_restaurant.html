@@ -1,0 +1,101 @@
+{% extends 'delivery/base.html' %} {% block content %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        form input,
+        form select,
+        form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        form button {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        form button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Restaurant Name:</label>
+        {{form.Res_name}}
+
+        <label>Food Category:</label>
+        {{form.Food_cat}}
+
+        <label>Rating:</label>
+        {{form.rating}}
+        
+        <label>Image:</label>
+        {{form.img}}
+
+        <label>Address:</label>
+        {{form.address}}
+
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>
+{% endblock %}
+
+<!-- <form method="POST">
+
+    {% csrf_token %}
+
+    <label>Restaurant Name:</label>
+    {{form.Res_name}}
+
+    <label>Food Category:</label>
+    {{form.Food_cat}}
+
+    <label>Rating:</label>
+    {{form.rating}}
+    
+    <label>Image:</label>
+    {{form.img}}
+
+    <label>Address:</label>
+    {{form.address}}
+
+    <button type="submit">submit</button>
+</form> -->
