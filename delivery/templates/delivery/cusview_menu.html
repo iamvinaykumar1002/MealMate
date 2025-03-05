@@ -1,6 +1,76 @@
-{% extends 'delivery/cusbase.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery App Navigation</title>
+    <style>
+        /* Premium navigation bar CSS */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav {
+            background-color: #1A1D23; /* Deep blue background */
+            padding: 1em;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center; /* Center links vertically */
+        }
+        
+        nav a {
+            color: #FFFFFF; /* Bright white text */
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 16px; /* Larger font size for readability */
+            font-weight: 500; /* Slightly bold text */
+        }
+        
+        nav a:hover {
+            color: #FF8C00; /* Vibrant orange on hover */
+        }
+        
+        nav a.active {
+            color: #FF6F00; /* Darker orange for active link */
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column; /* Stack links on smaller screens */
+                align-items: center;
+            }
+            nav li {
+                margin-bottom: 10px; /* Add spacing between links on mobile */
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'delivery:sign_in' %}" class="{% if request.path == '/signin/' %}active{% endif %}">Sign In</a></li>
+            <li><a href="{% url 'delivery:sign_up' %}" class="{% if request.path == '/signup/' %}active{% endif %}">Sign Up</a></li>
+            <li><a href="{% url 'delivery:cusdisplay_res' username %}" class="{% if request.path == '/cusdisplay_res/' %}active{% endif %}">Display Restaurants</a></li>
+            <li><a href="{% url 'delivery:show_cart' username %}">Show Cart </a></li>
+        </ul>
+    </nav>
+</body>
+</html>
 
-{% block content %}
     <div class="menu-container">
         <h2>Menu for {{ res.Res_name }}</h2>
         <div class="restaurant-info">
@@ -11,6 +81,7 @@
 
         <table class="menu-table">
             <thead>
+                <!-- <a href="{% url 'delivery:show_cart' username %}">Show Cart </a> -->
                 <tr>
                     <th>Item Name</th>
                     <th>Description</th>
@@ -109,4 +180,4 @@
             background: #0056b3;
         }
     </style>
-{% endblock %}
+

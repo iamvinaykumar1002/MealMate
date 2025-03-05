@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 
 from .forms import ResForm, MenuForm
 
-from .models import Customer, Restaurants, Menu
-
+from .models import Customer, Restaurants, Menu, Cart
 
 # Create your views here.
 def index(request):
@@ -17,6 +16,7 @@ def sign_up(request):
     return render(request, 'delivery/sign_up.html')
 
 def handle_signin(request):
+    li = Restaurants.objects.all()
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -25,7 +25,7 @@ def handle_signin(request):
             if(username == "admin"):
                 return render(request, 'delivery/success.html')
             else:
-                return render(request, 'delivery/customer_home.html')
+                return render(request, 'delivery/cusdisplay_res.html', {'username':username, 'li':li})
         except:
             return render(request, 'delivery/failure.html')
    
@@ -61,19 +61,20 @@ def display_res(request):
     li = Restaurants.objects.all()
     return render(request, 'delivery/display_res.html', {'li':li})
 
-def cusdisplay_res(request):
+def cusdisplay_res(request,username):
+    customer = Customer.objects.get(username=username)
     li = Restaurants.objects.all()
-    return render(request, 'delivery/cusdisplay_res.html', {'li':li})
+    return render(request, 'delivery/cusdisplay_res.html', {'li':li, 'username':username})
 
 def view_menu(request, id):
     res = Restaurants.objects.get(pk=id)
     menu = Menu.objects.filter(res=res)
     return render(request, 'delivery/view_menu.html', {'res':res, 'menu':menu})
 
-def cusview_menu(request, id):
+def cusview_menu(request, id,username):
     res = Restaurants.objects.get(pk=id)
     menu = Menu.objects.filter(res=res)
-    return render(request, 'delivery/cusview_menu.html', {'res':res, 'menu':menu})
+    return render(request, 'delivery/cusview_menu.html', {'res':res, 'menu':menu, 'username':username})
 
 def add_menu(request, id):
     restaurant = Restaurants.objects.get(pk=id)
@@ -93,9 +94,7 @@ def delete_menu(request, id):
     item.delete()
     return redirect('delivery:view_menu', res_id)
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import ResForm
-from .models import Restaurants
+
 
 def update_restaurant(request, id):
     restaurant = get_object_or_404(Restaurants, pk=id)
@@ -110,3 +109,10 @@ def delete_restaurant(request, id):
     restaurant = get_object_or_404(Restaurants, pk=id)
     restaurant.delete()
     return redirect('delivery:display_res')
+
+def show_cart(request, username):
+    customer = Customer.objects.get(username=username)
+    cart = Cart.objects.filter(customer= customer).first()
+    items = cart.items.all() if cart else []
+    total_price = cart.total_price() if cart else 0
+    return render(request, 'delivery/show_cart.html', {'items':items, 'total_price':total_price,'username':username})
