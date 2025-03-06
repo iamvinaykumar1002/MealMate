@@ -1,8 +1,10 @@
+from pyexpat.errors import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-
+from django.conf import settings
+from django.contrib import messages
 from .forms import ResForm, MenuForm
-
+import razorpay
 from .models import Customer, Restaurants, Menu, Cart
 
 # Create your views here.
@@ -116,3 +118,55 @@ def show_cart(request, username):
     items = cart.items.all() if cart else []
     total_price = cart.total_price() if cart else 0
     return render(request, 'delivery/show_cart.html', {'items':items, 'total_price':total_price,'username':username})
+
+def add_to_cart(request,username,menuid):
+    customer = Customer.objects.get(username = username)
+    item = Menu.objects.get(pk=menuid)
+    cart, created = Cart.objects.get_or_create(customer = customer)
+    cart.items.add(item)
+    messages.success(request,f"{item.item_name} added")
+    return redirect('delivery:cusview_menu', id = item.res.id,username=username)
+
+def checkout(request, username):
+    customer = Customer.objects.get(username = username)
+    cart = Cart.objects.filter(customer = customer).first()
+    cart_items = cart.items.all() if cart else []
+    total_price = cart.total_price() if cart else 0
+
+    if total_price == 0:
+        return render(request, 'delivery/checkout.html',{'error':'Your cart is Empty'})
+
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+    order_data = {
+        'amount':int(total_price * 100),
+        'currency':'INR',
+        'payment_capture':'1',
+    }
+    order = client.order.create(data = order_data)
+    return render(
+        request, 'delivery/checkout.html',
+        {'username':username,
+        'cart_items':cart_items,
+        'total_price':total_price,
+        'razorpay_key_id':settings.RAZORPAY_KEY_ID,
+        'order_id':order['id'],
+        'amount':total_price,
+        }
+    )
+
+def orders(request, username):
+        customer = Customer.objects.get(username = username)
+        cart = Cart.objects.filter(customer=customer).first()
+        cart_items = cart.items.all() if cart else []
+        total_price = cart.total_price() if cart else 0
+
+        if cart:
+            cart.items.clear()
+
+        return render(request, 'delivery/orders.html',{
+        'username':username,
+        'cart_items':cart_items,
+        'total_price':total_price,
+        'customer':customer
+        })
